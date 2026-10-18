@@ -5,7 +5,7 @@
  *   - Suhu air kolam    : DS18B20 waterproof (OneWire)
  *   - Suhu & kelembapan : DHT22
  * Mengirim data (HTTP POST, JSON) ke Node-RED lewat Cloudflare Tunnel:
- *   https://hydroponic.hansprojects.com/api/sensor
+ *   https://hydroponic.hansprojects.com/sensor-data
  *
  * Wiring (default, ubah sesuai rangkaian):
  *   DS18B20 DATA -> GPIO 4  (+ resistor pull-up 4.7k ke 3.3V)
@@ -19,8 +19,9 @@
  *   Board: ESP32 (Espressif ESP32 core)
  *
  * Contoh payload:
- *   {"device":"hydro-esp32-01","water_temp":27.31,"air_temp":30.20,
- *    "air_humidity":71.50,"rssi":-61,"uptime_s":1234}
+ *   {"device":"hydro-esp32-01","water_temp_c":27.31,"air_temp_c":30.20,
+ *    "humidity_percent":71.50,"rssi":-61,"uptime_s":1234}
+ *   Nama field mengikuti flow Node-RED (air_temp_c, water_temp_c, humidity_percent).
  *   Nilai sensor yang gagal dibaca dikirim sebagai null.
  */
 
@@ -35,11 +36,12 @@
 const char* WIFI_SSID     = "YOUR_WIFI_SSID";
 const char* WIFI_PASSWORD = "YOUR_WIFI_PASSWORD";
 
-// Endpoint Node-RED (node "http in", method POST). Sesuaikan path-nya.
-const char* ENDPOINT_URL  = "https://example.com";
+// Endpoint Node-RED (node "http in" "Sensor Input", method POST, url /sensor-data)
+const char* ENDPOINT_URL  = "https://hydroponic.hansprojects.com/sensor-data";
 
-// Opsional: kunci sederhana yang dicek di Node-RED. Kosongkan "" jika tidak dipakai.
-const char* API_KEY       = "CHANGE_ME";
+// Opsional: kunci sederhana yang dicek di Node-RED. Flow saat ini tidak mengeceknya,
+// jadi dibiarkan kosong "" (header tidak dikirim).
+const char* API_KEY       = "";
 
 const char* DEVICE_ID     = "hydro-esp32-01";
 
@@ -92,11 +94,11 @@ void sendReading(float waterTemp, bool waterOk,
                  float airHum, bool airHumOk) {
   String payload = "{";
   payload += "\"device\":\"" + String(DEVICE_ID) + "\",";
-  payload += "\"water_temp\":"   + jsonNumber(waterTemp, waterOk) + ",";
-  payload += "\"air_temp\":"     + jsonNumber(airTemp, airTempOk) + ",";
-  payload += "\"air_humidity\":" + jsonNumber(airHum, airHumOk) + ",";
-  payload += "\"rssi\":"         + String(WiFi.RSSI()) + ",";
-  payload += "\"uptime_s\":"     + String(millis() / 1000);
+  payload += "\"water_temp_c\":"     + jsonNumber(waterTemp, waterOk) + ",";
+  payload += "\"air_temp_c\":"       + jsonNumber(airTemp, airTempOk) + ",";
+  payload += "\"humidity_percent\":" + jsonNumber(airHum, airHumOk) + ",";
+  payload += "\"rssi\":"             + String(WiFi.RSSI()) + ",";
+  payload += "\"uptime_s\":"         + String(millis() / 1000);
   payload += "}";
 
   WiFiClientSecure client;
