@@ -1,0 +1,339 @@
+[
+    {
+        "id": "d36bb2ccc45e9a57",
+        "type": "tab",
+        "label": "Flow 1",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "2a5258880b20023a",
+        "type": "ui-base",
+        "name": "My Dashboard",
+        "path": "/dashboard",
+        "appIcon": "",
+        "includeClientData": true,
+        "acceptsClientConfig": [
+            "ui-notification",
+            "ui-control"
+        ],
+        "showPathInSidebar": false,
+        "headerContent": "page",
+        "navigationStyle": "default",
+        "titleBarStyle": "default",
+        "showReconnectNotification": true,
+        "notificationDisplayTime": 1,
+        "showDisconnectNotification": true,
+        "allowInstall": false
+    },
+    {
+        "id": "8fc9fab984f9f14f",
+        "type": "ui-theme",
+        "name": "Default Theme",
+        "colors": {
+            "surface": "#fcfcfd",
+            "primary": "#0d74ce",
+            "bgPage": "#f9f9fb",
+            "groupBg": "#ffffff",
+            "groupOutline": "#d9d9e0"
+        },
+        "sizes": {
+            "density": "default",
+            "pagePadding": "12px",
+            "groupGap": "12px",
+            "groupBorderRadius": "4px",
+            "widgetGap": "12px"
+        }
+    },
+    {
+        "id": "c40d4ad9566b6582",
+        "type": "ui-page",
+        "name": " Hydroponics",
+        "ui": "2a5258880b20023a",
+        "path": "/page1",
+        "icon": "home",
+        "layout": "grid",
+        "theme": "8fc9fab984f9f14f",
+        "breakpoints": [
+            {
+                "name": "Default",
+                "px": "0",
+                "cols": "3"
+            },
+            {
+                "name": "Tablet",
+                "px": "576",
+                "cols": "6"
+            },
+            {
+                "name": "Small Desktop",
+                "px": "768",
+                "cols": "9"
+            },
+            {
+                "name": "Desktop",
+                "px": "1024",
+                "cols": "12"
+            }
+        ],
+        "order": 1,
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "0f3a775f56be2e2e",
+        "type": "ui-group",
+        "name": "Water and Air Parameters",
+        "page": "c40d4ad9566b6582",
+        "width": 12,
+        "height": 1,
+        "order": 1,
+        "showTitle": true,
+        "className": "",
+        "visible": "true",
+        "disabled": "false",
+        "groupType": "default"
+    },
+    {
+        "id": "cad461c6f325796d",
+        "type": "http in",
+        "z": "d36bb2ccc45e9a57",
+        "name": "Sensor Input",
+        "url": "/sensor-data",
+        "method": "post",
+        "upload": false,
+        "skipBodyParsing": false,
+        "swaggerDoc": "",
+        "x": 310,
+        "y": 220,
+        "wires": [
+            [
+                "1b537dbc9a9117ff",
+                "8014a2e4dcc0948b",
+                "44c78b56b56358f7",
+                "5e2b7c41a9d3f010"
+            ]
+        ]
+    },
+    {
+        "id": "c674db1314593f98",
+        "type": "ui-chart",
+        "z": "d36bb2ccc45e9a57",
+        "group": "0f3a775f56be2e2e",
+        "name": "Water & Air Temperature History",
+        "label": "Water & Air Temperature History",
+        "order": 2,
+        "chartType": "line",
+        "category": "topic",
+        "categoryType": "msg",
+        "xAxisLabel": "Time",
+        "xAxisProperty": "",
+        "xAxisPropertyType": "timestamp",
+        "xAxisType": "time",
+        "xAxisFormat": "",
+        "xAxisFormatType": "{HH}:{mm}",
+        "xmin": "",
+        "xmax": "",
+        "yAxisLabel": "Celcius",
+        "yAxisProperty": "payload",
+        "yAxisPropertyType": "msg",
+        "ymin": "10",
+        "ymax": "50",
+        "bins": 10,
+        "action": "append",
+        "stackSeries": false,
+        "pointShape": "circle",
+        "pointRadius": 4,
+        "showLegend": true,
+        "removeOlder": 1,
+        "removeOlderUnit": "3600",
+        "removeOlderPoints": "",
+        "colors": [
+            "#0095ff",
+            "#ff0000",
+            "#ff7f0e",
+            "#2ca02c",
+            "#a347e1",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "textColor": [
+            "#666666"
+        ],
+        "textColorDefault": true,
+        "gridColor": [
+            "#e5e5e5"
+        ],
+        "gridColorDefault": true,
+        "width": 6,
+        "height": 8,
+        "className": "",
+        "interpolation": "linear",
+        "x": 940,
+        "y": 180,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "1b537dbc9a9117ff",
+        "type": "function",
+        "z": "d36bb2ccc45e9a57",
+        "name": "Remap topic water and air",
+        "func": "var airMsg = { topic: \"Air Temperature\", payload: msg.payload.air_temp_c };\nvar waterMsg = { topic: \"Water Temperature\", payload: msg.payload.water_temp_c };\nreturn [[airMsg, waterMsg]];",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 570,
+        "y": 180,
+        "wires": [
+            [
+                "c674db1314593f98"
+            ]
+        ]
+    },
+    {
+        "id": "8014a2e4dcc0948b",
+        "type": "function",
+        "z": "d36bb2ccc45e9a57",
+        "name": "Evaluate status",
+        "func": "function evalStatus(val, min, max) {\n    if (val === undefined || val === null) return { text: \"N/A\", color: \"#9e9e9e\" };\n    if (val < min || val > max) return { text: \"Warning\", color: \"#e53935\" };\n    return { text: \"Normal\", color: \"#43a047\" };\n}\n\nvar airTemp = msg.payload.air_temp_c;\nvar waterTemp = msg.payload.water_temp_c;\nvar humidity = msg.payload.humidity_percent;\n\nvar air = evalStatus(airTemp, 20, 30);\nvar water = evalStatus(waterTemp, 18, 26);\nvar hum = evalStatus(humidity, 50, 70);\n\nmsg.payload = {\n    airTemp: airTemp, airStatus: air.text, airColor: air.color,\n    waterTemp: waterTemp, waterStatus: water.text, waterColor: water.color,\n    humidity: humidity, humStatus: hum.text, humColor: hum.color\n};\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 560,
+        "y": 380,
+        "wires": [
+            [
+                "b1110a6c6087672d"
+            ]
+        ]
+    },
+    {
+        "id": "b1110a6c6087672d",
+        "type": "ui-template",
+        "z": "d36bb2ccc45e9a57",
+        "group": "0f3a775f56be2e2e",
+        "page": "",
+        "ui": "",
+        "name": "HTML",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "head": "",
+        "format": "<div style=\"display:flex; gap:12px; flex-wrap:wrap;\">\n    <div\n        style=\"flex:1; min-width:140px; padding:12px; border-radius:8px; background:#f5f5f5; border-left:6px solid {{msg.payload.airColor}};\">\n        <div style=\"font-size:12px; color:#777;\">AIR TEMPERATURE</div>\n        <div style=\"font-size:24px; font-weight:bold;\">{{msg.payload.airTemp}}°C</div>\n        <div style=\"color:{{msg.payload.airColor}}; font-weight:bold;\">{{msg.payload.airStatus}}</div>\n    </div>\n    <div\n        style=\"flex:1; min-width:140px; padding:12px; border-radius:8px; background:#f5f5f5; border-left:6px solid {{msg.payload.waterColor}};\">\n        <div style=\"font-size:12px; color:#777;\">WATER TEMPERATURE</div>\n        <div style=\"font-size:24px; font-weight:bold;\">{{msg.payload.waterTemp}}°C</div>\n        <div style=\"color:{{msg.payload.waterColor}}; font-weight:bold;\">{{msg.payload.waterStatus}}</div>\n    </div>\n    <div\n        style=\"flex:1; min-width:140px; padding:12px; border-radius:8px; background:#f5f5f5; border-left:6px solid {{msg.payload.humColor}};\">\n        <div style=\"font-size:12px; color:#777;\">HUMIDITY</div>\n        <div style=\"font-size:24px; font-weight:bold;\">{{msg.payload.humidity}}%</div>\n        <div style=\"color:{{msg.payload.humColor}}; font-weight:bold;\">{{msg.payload.humStatus}}</div>\n    </div>\n</div>",
+        "storeOutMessages": true,
+        "passthru": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 810,
+        "y": 420,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "b68c4572552831b4",
+        "type": "ui-chart",
+        "z": "d36bb2ccc45e9a57",
+        "group": "0f3a775f56be2e2e",
+        "name": "Humidity History",
+        "label": "Humidity History",
+        "order": 3,
+        "chartType": "line",
+        "category": "topic",
+        "categoryType": "msg",
+        "xAxisLabel": "Time",
+        "xAxisProperty": "",
+        "xAxisPropertyType": "timestamp",
+        "xAxisType": "time",
+        "xAxisFormat": "",
+        "xAxisFormatType": "{HH}:{mm}",
+        "xmin": "",
+        "xmax": "",
+        "yAxisLabel": "Percent",
+        "yAxisProperty": "payload",
+        "yAxisPropertyType": "msg",
+        "ymin": "0",
+        "ymax": "100",
+        "bins": 10,
+        "action": "append",
+        "stackSeries": false,
+        "pointShape": "circle",
+        "pointRadius": 4,
+        "showLegend": true,
+        "removeOlder": 1,
+        "removeOlderUnit": "3600",
+        "removeOlderPoints": "",
+        "colors": [
+            "#0095ff",
+            "#ff0000",
+            "#ff7f0e",
+            "#2ca02c",
+            "#a347e1",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "textColor": [
+            "#666666"
+        ],
+        "textColorDefault": true,
+        "gridColor": [
+            "#e5e5e5"
+        ],
+        "gridColorDefault": true,
+        "width": 6,
+        "height": 8,
+        "className": "",
+        "interpolation": "linear",
+        "x": 840,
+        "y": 240,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "44c78b56b56358f7",
+        "type": "function",
+        "z": "d36bb2ccc45e9a57",
+        "name": "Remap humidity",
+        "func": "var humidityMsg = { topic: \"Humidity\", payload: msg.payload.humidity_percent };\nreturn [[humidityMsg]];",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 590,
+        "y": 240,
+        "wires": [
+            [
+                "b68c4572552831b4"
+            ]
+        ]
+    },
+    {
+        "id": "5e2b7c41a9d3f010",
+        "type": "http response",
+        "z": "d36bb2ccc45e9a57",
+        "name": "Reply 200 OK",
+        "statusCode": "200",
+        "headers": {},
+        "x": 560,
+        "y": 300,
+        "wires": []
+    }
+]
